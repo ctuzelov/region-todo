@@ -1,19 +1,20 @@
 package repository
 
-import "go.mongodb.org/mongo-driver/mongo"
-
-type Authorization interface {
-}
+import (
+	"github.com/ctuzelov/region-todo/pkg/models"
+	"go.mongodb.org/mongo-driver/mongo"
+)
 
 type ToDoList interface {
-	CreateList()
+	CreateTask(task models.Task) (int, error)
 }
 
 type Repository struct {
-	Authorization
 	ToDoList
 }
 
 func NewRepository(db *mongo.Client) *Repository {
-	return &Repository{}
+	return &Repository{
+		ToDoList: NewToDoListMongoDB(db),
+	}
 }
