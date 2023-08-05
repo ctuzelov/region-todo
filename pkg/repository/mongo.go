@@ -2,6 +2,7 @@ package repository
 
 import (
 	"context"
+	"fmt"
 	"log"
 
 	"go.mongodb.org/mongo-driver/mongo"
@@ -17,8 +18,9 @@ type Config struct {
 }
 
 func NewMongoDB(cnf Config) (*mongo.Client, error) {
+	URI := fmt.Sprintf("%s://%s:%s@%s:%s", cnf.Driver, cnf.Username, cnf.Password, cnf.Host, cnf.Port)
 	// Set client options.
-	clientOptions := options.Client().ApplyURI("mongodb://root:123@localhost:2717")
+	clientOptions := options.Client().ApplyURI(URI)
 
 	// Connect to MongoDB.
 	client, err := mongo.Connect(context.Background(), clientOptions)
