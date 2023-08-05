@@ -1,0 +1,8 @@
+port: "8080"
+
+db:
+  driver: "mongodb"
+  username: "root"
+  password: "123"
+  host: "localhost"
+  port: "2717"
