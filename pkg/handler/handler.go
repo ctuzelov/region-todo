@@ -20,7 +20,8 @@ func (h *Handler) InitRoutes() *gin.Engine {
 
 	tasks.POST("/", h.createList)
 	tasks.GET("/:id", h.getListByID)
-	tasks.PUT("/:id", h.updateListByID)
+	tasks.PUT("/:id/done", h.updatTaskStatusByID)
+	tasks.PUT("/:id/", h.updatTaskByID)
 	tasks.DELETE("/:id", h.deleteListByID)
 
 	return router
