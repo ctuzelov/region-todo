@@ -7,6 +7,10 @@ import (
 
 type ToDoList interface {
 	CreateTask(task models.Task) (int, error)
+	ReadTask(id int) (models.Task, error)
+	UpdateStatus(id int) error
+	Delete(id int) error
+	UpdateTask(id int, task models.Task) error
 }
 
 type Repository struct {
