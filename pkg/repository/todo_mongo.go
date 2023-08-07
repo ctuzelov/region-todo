@@ -3,6 +3,7 @@ package repository
 import (
 	"context"
 	"errors"
+	"fmt"
 	"time"
 
 	"github.com/ctuzelov/region-todo/pkg/models"
@@ -10,17 +11,17 @@ import (
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
-type ToDoListMongoDB struct {
+type ToDoTasksMongoDB struct {
 	db *mongo.Client
 }
 
 const newStatus = "done"
 
-func NewToDoListMongoDB(db *mongo.Client) *ToDoListMongoDB {
-	return &ToDoListMongoDB{db}
+func NewToDoTasksMongoDB(db *mongo.Client) *ToDoTasksMongoDB {
+	return &ToDoTasksMongoDB{db}
 }
 
-func (r *ToDoListMongoDB) CreateTask(task models.Task) (int, error) {
+func (r *ToDoTasksMongoDB) CreateTask(task models.Task) (int, error) {
 	// Получение ссылки на коллекцию "tasks" в базе данных "testdb"
 	tasksCollection := r.db.Database("testdb").Collection("tasks")
 
@@ -67,29 +68,48 @@ func (r *ToDoListMongoDB) CreateTask(task models.Task) (int, error) {
 	return counter.Sequence + 1, nil
 }
 
-func (r *ToDoListMongoDB) ReadTask(id int) (models.Task, error) {
+func (r *ToDoTasksMongoDB) ReadTasks(status string) ([]models.Task, error) {
 	// Подключение к коллекции "people" в базе данных "testdb"
 	collection := r.db.Database("testdb").Collection("tasks")
 
+	filter := bson.M{"status": status}
+
 	// Поиск документа по указанному id
-	var todo models.Task
-	err := collection.FindOne(context.Background(), bson.M{"_id": id}).Decode(&todo)
+	var todo []models.Task
+	all, err := collection.Find(context.Background(), filter)
+
+	for all.Next(context.Background()) {
+		var task models.Task
+		if err := all.Decode(&task); err != nil {
+			return []models.Task{}, err
+		}
+		todo = append(todo, task)
+	}
+
+	if err := all.Err(); err != nil {
+		return []models.Task{}, err
+	}
+	defer all.Close(context.Background())
+
 	return todo, err
 }
 
-func (r *ToDoListMongoDB) Delete(id int) error {
+func (r *ToDoTasksMongoDB) DeleteTask(id int) error {
 	// Get a reference to the "tasks" taskscollection in the "testdb" database
-	taskscollection := r.db.Database("testdb").Collection("tasks")
+	tasksCollection := r.db.Database("testdb").Collection("tasks")
 
 	// Create a filter to find the task by ID
 	filter := bson.M{"_id": id}
 
 	// Delete the task from the collection
-	_, err := taskscollection.DeleteOne(context.Background(), filter)
+	res, err := tasksCollection.DeleteOne(context.Background(), filter)
+	if res.DeletedCount == 0 {
+		return fmt.Errorf("no object with the given id = %d", id)
+	}
 	return err
 }
 
-func (r *ToDoListMongoDB) UpdateStatus(id int) error {
+func (r *ToDoTasksMongoDB) UpdateTaskStatus(id int) error {
 	// Get a reference to the "tasks" tasksCollection in the "testdb" database
 	tasksCollection := r.db.Database("testdb").Collection("tasks")
 
@@ -102,7 +122,7 @@ func (r *ToDoListMongoDB) UpdateStatus(id int) error {
 	return err
 }
 
-func (r *ToDoListMongoDB) UpdateTask(id int, task models.Task) error {
+func (r *ToDoTasksMongoDB) UpdateTask(id int, task models.Task) error {
 	// Get a reference to the "tasks" tasksCollection in the "testdb" database
 	tasksCollection := r.db.Database("testdb").Collection("tasks")
 
@@ -117,7 +137,7 @@ func (r *ToDoListMongoDB) UpdateTask(id int, task models.Task) error {
 }
 
 /*
-func (r *ToDoListMongoDB) CreateTask(task models.Task) (int, error) {
+func (r *ToDoTasksMongoDB) CreateTask(task models.Task) (int, error) {
 	// Получение ссылки на коллекцию "tasks" в базе данных "testdb"
 	collection := r.db.Database("testdb").Collection("tasks")
 
