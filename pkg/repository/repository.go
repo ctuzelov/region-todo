@@ -5,20 +5,20 @@ import (
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
-type ToDoList interface {
+type ToDoTasks interface {
 	CreateTask(task models.Task) (int, error)
-	ReadTask(id int) (models.Task, error)
-	UpdateStatus(id int) error
-	Delete(id int) error
+	ReadTasks(status string) ([]models.Task, error)
+	UpdateTaskStatus(id int) error
+	DeleteTask(id int) error
 	UpdateTask(id int, task models.Task) error
 }
 
 type Repository struct {
-	ToDoList
+	ToDoTasks
 }
 
 func NewRepository(db *mongo.Client) *Repository {
 	return &Repository{
-		ToDoList: NewToDoListMongoDB(db),
+		ToDoTasks: NewToDoTasksMongoDB(db),
 	}
 }

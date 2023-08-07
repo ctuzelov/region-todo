@@ -6,10 +6,10 @@ import (
 )
 
 type ToDoListService struct {
-	repo repository.ToDoList
+	repo repository.ToDoTasks
 }
 
-func NewToDoService(repo repository.ToDoList) *ToDoListService {
+func NewToDoService(repo repository.ToDoTasks) *ToDoListService {
 	return &ToDoListService{repo: repo}
 }
 
@@ -17,16 +17,16 @@ func (s *ToDoListService) CreateTask(task models.Task) (int, error) {
 	return s.repo.CreateTask(task)
 }
 
-func (s *ToDoListService) ReadTask(id int) (models.Task, error) {
-	return s.repo.ReadTask(id)
+func (s *ToDoListService) ReadTasks(status string) ([]models.Task, error) {
+	return s.repo.ReadTasks(status)
 }
 
-func (s *ToDoListService) Delete(id int) error {
-	return s.repo.Delete(id)
+func (s *ToDoListService) DeleteTask(id int) error {
+	return s.repo.DeleteTask(id)
 }
 
-func (s *ToDoListService) UpdateStatus(id int) error {
-	return s.repo.UpdateStatus(id)
+func (s *ToDoListService) UpdateTaskStatus(id int) error {
+	return s.repo.UpdateTaskStatus(id)
 }
 
 func (s *ToDoListService) UpdateTask(id int, task models.Task) error {

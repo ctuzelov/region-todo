@@ -18,11 +18,11 @@ func (h *Handler) InitRoutes() *gin.Engine {
 
 	tasks := router.Group("/api/todo-list/tasks")
 
-	tasks.POST("/", h.createList)
-	tasks.GET("/:id", h.getListByID)
-	tasks.PUT("/:id/done", h.updatTaskStatusByID)
-	tasks.PUT("/:id/", h.updatTaskByID)
-	tasks.DELETE("/:id", h.deleteListByID)
+	tasks.POST("/", h.createTask)
+	tasks.GET("/", h.getTasksByStatus)
+	tasks.PUT("/:id/done", h.updateTaskStatusByID)
+	tasks.PUT("/:id", h.updateTaskByID)
+	tasks.DELETE("/:id", h.deleteTaskByID)
 
 	return router
 }

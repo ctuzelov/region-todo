@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"log"
 
-	"github.com/ctuzelov/region-todo/internal/repository"
+	"github.com/ctuzelov/region-todo/pkg/repository"
 	"github.com/spf13/viper"
 	"go.mongodb.org/mongo-driver/bson"
 )
