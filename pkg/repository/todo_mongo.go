@@ -118,7 +118,10 @@ func (r *ToDoTasksMongoDB) UpdateTaskStatus(id int) error {
 
 	// Update the "status" field in the task
 	update := bson.M{"$set": bson.M{"status": newStatus}}
-	_, err := tasksCollection.UpdateOne(context.Background(), filter, update)
+	res, err := tasksCollection.UpdateOne(context.Background(), filter, update)
+	if res.MatchedCount == 0 {
+		return fmt.Errorf("no object with the given id = %d", id)
+	}
 	return err
 }
 
@@ -132,43 +135,10 @@ func (r *ToDoTasksMongoDB) UpdateTask(id int, task models.Task) error {
 	// Создаем обновление только для полей Title и ActiveAt
 	update := bson.M{"$set": bson.M{"title": task.Title, "activeAt": task.ActiveAt}}
 
-	_, err := tasksCollection.UpdateOne(context.Background(), filter, update)
+	res, err := tasksCollection.UpdateOne(context.Background(), filter, update)
+	if res.MatchedCount == 0 {
+		return fmt.Errorf("no object with the given id = %d", id)
+	}
 	return err
 }
 
-/*
-func (r *ToDoTasksMongoDB) CreateTask(task models.Task) (int, error) {
-	// Получение ссылки на коллекцию "tasks" в базе данных "testdb"
-	collection := r.db.Database("testdb").Collection("tasks")
-
-	// Создание счетчика, если его нет
-	countersCollection := r.db.Database("testdb").Collection("counters")
-	countersCollection.InsertOne(context.Background(), models.Counter{ID: "taskID", Sequence: 0})
-
-	// Генерация нового _id на основе счетчика
-	var counter models.Counter
-	err := countersCollection.FindOneAndUpdate(context.Background(), bson.M{"_id": "taskID"}, bson.M{"$inc": bson.M{"sequence": 1}}).Decode(&counter)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	// Получение текущего значения счетчика
-	err = countersCollection.FindOne(context.Background(), bson.M{"_id": "taskID"}).Decode(&models.Counter{})
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	todo := models.Task{
-		ID:       counter.Sequence + 1,
-		Title:    task.Title,
-		ActiveAt: task.ActiveAt,
-	}
-
-	// Вставка документа в MongoDB
-	_, err = collection.InsertOne(context.Background(), todo)
-	if err != nil {
-		log.Fatal(err)
-	}
-	return counter.Sequence + 1, nil
-}
-*/
