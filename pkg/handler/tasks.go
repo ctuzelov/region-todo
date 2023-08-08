@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/ctuzelov/region-todo/pkg/models"
+	"github.com/ctuzelov/region-todo/pkg/validator"
 	"github.com/gin-gonic/gin"
 	_ "github.com/swaggo/gin-swagger"
 )
@@ -35,6 +36,11 @@ func (h *Handler) createTask(g *gin.Context) {
 	err := Parser(g, &input)
 	if err != nil {
 		ErrorResponse(g, err.Error())
+		return
+	}
+
+	if !validator.Valid(validator.NotBlank(input.Title), validator.MaxChars(input.Title, 200), validator.IsValidDate(input.ActiveAt)) {
+		ErrorResponse(g, errForm.Error())
 		return
 	}
 
@@ -193,6 +199,11 @@ func (h *Handler) updateTaskByID(g *gin.Context) {
 	err = Parser(g, &input)
 	if err != nil {
 		ErrorResponse(g, err.Error())
+		return
+	}
+
+	if !validator.Valid(validator.NotBlank(input.Title), validator.MaxChars(input.Title, 200), validator.IsValidDate(input.ActiveAt)) {
+		ErrorResponse(g, errForm.Error())
 		return
 	}
 
