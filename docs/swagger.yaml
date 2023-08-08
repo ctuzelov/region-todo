@@ -1,0 +1,49 @@
+basePath: /
+definitions:
+  handler.todoForm:
+    properties:
+      activeAt:
+        type: string
+      title:
+        type: string
+    type: object
+host: localhost:8080
+info:
+  contact:
+    email: support@swagger.io
+    name: API Support
+    url: http://www.swagger.io/support
+  description: This is a sample server server.
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  termsOfService: http://swagger.io/terms/
+  title: TODO TASKS API
+  version: "1.0"
+paths:
+  /api/todo-list/tasks:
+    post:
+      consumes:
+      - application/json
+      description: Create a new task with the provided input
+      operationId: create-task
+      parameters:
+      - description: Task input
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/handler.todoForm'
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: No Content
+        "404":
+          description: Not Found
+      summary: Create a new task
+      tags:
+      - Tasks
+schemes:
+- http
+swagger: "2.0"
