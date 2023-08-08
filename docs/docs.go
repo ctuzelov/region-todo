@@ -26,6 +26,32 @@ const docTemplate = `{
     "basePath": "{{.BasePath}}",
     "paths": {
         "/api/todo-list/tasks": {
+            "get": {
+                "description": "Get tasks by the specified status or default to 'active'",
+                "tags": [
+                    "Tasks"
+                ],
+                "summary": "Get tasks by status",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Task status (default: active)",
+                        "name": "status",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/handler.todoForm"
+                            }
+                        }
+                    }
+                }
+            },
             "post": {
                 "description": "Create a new task with the provided input",
                 "consumes": [
@@ -38,7 +64,6 @@ const docTemplate = `{
                     "Tasks"
                 ],
                 "summary": "Create a new task",
-                "operationId": "create-task",
                 "parameters": [
                     {
                         "description": "Task input",
@@ -48,6 +73,103 @@ const docTemplate = `{
                         "schema": {
                             "$ref": "#/definitions/handler.todoForm"
                         }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "No Content"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    }
+                }
+            }
+        },
+        "/api/todo-list/tasks/{id}": {
+            "put": {
+                "description": "Update a task with the provided input",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Tasks"
+                ],
+                "summary": "Update a task by ID",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Task ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Task input",
+                        "name": "input",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/handler.todoForm"
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "No Content"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    }
+                }
+            },
+            "delete": {
+                "description": "Delete a task by the specified ID",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Tasks"
+                ],
+                "summary": "Delete a task by ID",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Task ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "No Content"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    }
+                }
+            }
+        },
+        "/api/todo-list/tasks/{id}/done": {
+            "put": {
+                "description": "Updates the status of a task by ID.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Tasks"
+                ],
+                "summary": "Update a task status by ID",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "The ID of the task to update",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
                     }
                 ],
                 "responses": {

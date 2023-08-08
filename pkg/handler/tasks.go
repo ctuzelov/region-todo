@@ -27,7 +27,7 @@ type todoForm struct {
 //	@Produce		json
 //	@Param			input	body	todoForm	true	"Task input"
 //	@Success		204		"No Content"
-//	@Failure		404		"Not Found"
+//	@Failure		404		"Not Found"	
 //	@Router			/api/todo-list/tasks [post]
 func (h *Handler) createTask(g *gin.Context) {
 	var input todoForm
@@ -70,7 +70,6 @@ func (h *Handler) createTask(g *gin.Context) {
 //	@Param			status	query	string	false	"Task status (default: active)"
 //	@Success		200		{array}	todoForm
 //	@Router			/api/todo-list/tasks [get]
-
 func (h *Handler) getTasksByStatus(g *gin.Context) {
 	status := g.DefaultQuery("status", "active")
 
@@ -123,9 +122,8 @@ func (h *Handler) getTasksByStatus(g *gin.Context) {
 //	@Produce		json
 //	@Param			id	path	int	true	"Task ID"
 //	@Success		204	"No Content"
-//	@Failure		404	"Not Found"
+//	@Failure		404	"Not Found"	Task	not	found
 //	@Router			/api/todo-list/tasks/{id} [delete]
-
 func (h *Handler) deleteTaskByID(g *gin.Context) {
 	// Get the task ID from the URL parameters
 	idStr := g.Param("id")
@@ -155,10 +153,8 @@ func (h *Handler) deleteTaskByID(g *gin.Context) {
 //	@Produce		json
 //	@Param			id	path	int	true	"The ID of the task to update"
 //	@Success		204	"No Content"
-//	@Failure		400	"Bad Request"	Invalid	request
 //	@Failure		404	"Not Found"		Task	not	found
-//	@Router			/api/todo-list/tasks/{id} [put]
-
+//	@Router			/api/todo-list/tasks/{id}/done [put]
 func (h *Handler) updateTaskStatusByID(g *gin.Context) {
 	// Get the task ID from the URL parameters
 	idStr := g.Param("id")
@@ -189,8 +185,7 @@ func (h *Handler) updateTaskStatusByID(g *gin.Context) {
 //	@Param			input	body	todoForm	true	"Task input"
 //	@Success		204		"No Content"
 //	@Failure		404		"Not Found"
-//	@Router			/api/todo-list/tasks/:id [put]
-
+//	@Router			/api/todo-list/tasks/{id} [put]
 func (h *Handler) updateTaskByID(g *gin.Context) {
 	var input todoForm
 	idStr := g.Param("id")

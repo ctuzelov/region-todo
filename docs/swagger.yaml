@@ -22,11 +22,27 @@ info:
   version: "1.0"
 paths:
   /api/todo-list/tasks:
+    get:
+      description: Get tasks by the specified status or default to 'active'
+      parameters:
+      - description: 'Task status (default: active)'
+        in: query
+        name: status
+        type: string
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/handler.todoForm'
+            type: array
+      summary: Get tasks by status
+      tags:
+      - Tasks
     post:
       consumes:
       - application/json
       description: Create a new task with the provided input
-      operationId: create-task
       parameters:
       - description: Task input
         in: body
@@ -42,6 +58,70 @@ paths:
         "404":
           description: Not Found
       summary: Create a new task
+      tags:
+      - Tasks
+  /api/todo-list/tasks/{id}:
+    delete:
+      description: Delete a task by the specified ID
+      parameters:
+      - description: Task ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: No Content
+        "404":
+          description: Not Found
+      summary: Delete a task by ID
+      tags:
+      - Tasks
+    put:
+      consumes:
+      - application/json
+      description: Update a task with the provided input
+      parameters:
+      - description: Task ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Task input
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/handler.todoForm'
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: No Content
+        "404":
+          description: Not Found
+      summary: Update a task by ID
+      tags:
+      - Tasks
+  /api/todo-list/tasks/{id}/done:
+    put:
+      description: Updates the status of a task by ID.
+      parameters:
+      - description: The ID of the task to update
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: No Content
+        "404":
+          description: Not Found
+      summary: Update a task status by ID
       tags:
       - Tasks
 schemes:
