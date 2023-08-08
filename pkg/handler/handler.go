@@ -17,16 +17,6 @@ func NewHandler(services *service.Service) *Handler {
 	return &Handler{service: services}
 }
 
-// tasksRouter defines operations for managing tasks.
-//	@Summary		Manage tasks
-//	@Description	Operations for managing tasks
-//	@Tags			Tasks
-//	@Router			/api/todo-list/tasks/{id} [delete]
-//	@Router			/api/todo-list/tasks [post]
-//	@Router			/api/todo-list/tasks [get]
-//	@Router			/api/todo-list/tasks/{id} [put]
-//	@Router			/api/todo-list/tasks/{id}/done [put]
-
 func (h *Handler) InitRoutes() *gin.Engine {
 	router := gin.New()
 

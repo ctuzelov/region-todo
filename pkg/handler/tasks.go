@@ -58,13 +58,12 @@ func (h *Handler) createTask(g *gin.Context) {
 }
 
 // getTasksByStatus gets tasks by status.
+//
 //	@Summary		Get tasks by status
 //	@Description	Get tasks by the specified status or default to 'active'
 //	@Tags			Tasks
-//	@Produce		json
-//	@Param			status	query		string	false	"Task status (default: active)"
-//	@Success		200		{object}	todoForm
-//	@Failure		400,	404			{object}	ErrorResponse
+//	@Param			status	query	string	false	"Task status (default: active)"
+//	@Success		200		{array}	todoForm
 //	@Router			/api/todo-list/tasks [get]
 
 func (h *Handler) getTasksByStatus(g *gin.Context) {
@@ -106,6 +105,8 @@ func (h *Handler) getTasksByStatus(g *gin.Context) {
 	g.JSON(http.StatusOK, response)
 }
 
+// deleteTaskByID deletes a task by ID.
+//
 //	@Summary		Delete a task by ID
 //	@Description	Delete a task by the specified ID
 //	@Tags			Tasks
@@ -136,6 +137,18 @@ func (h *Handler) deleteTaskByID(g *gin.Context) {
 	g.Status(http.StatusNoContent)
 }
 
+// updateTaskStatusByID updates a task status by ID.
+//
+//	@Summary		Update a task status by ID
+//	@Description	Updates the status of a task by ID.
+//	@Tags			Tasks
+//	@Produce		json
+//	@Param			id	path	int	true	"The ID of the task to update"
+//	@Success		204	"No Content"
+//	@Failure		400	"Bad Request"	Invalid	request
+//	@Failure		404	"Not Found"		Task	not	found
+//	@Router			/api/todo-list/tasks/{id} [put]
+
 func (h *Handler) updateTaskStatusByID(g *gin.Context) {
 	// Get the task ID from the URL parameters
 	idStr := g.Param("id")
@@ -156,11 +169,13 @@ func (h *Handler) updateTaskStatusByID(g *gin.Context) {
 }
 
 // updateTaskByID updates a task by ID.
+//
 //	@Summary		Update a task by ID
 //	@Description	Update a task with the provided input
 //	@Tags			Tasks
 //	@Accept			json
 //	@Produce		json
+//	@Param			id		path	int			true	"Task ID"
 //	@Param			input	body	todoForm	true	"Task input"
 //	@Success		204		"No Content"
 //	@Failure		404		"Not Found"
