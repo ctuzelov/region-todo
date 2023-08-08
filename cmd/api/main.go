@@ -9,7 +9,6 @@ import (
 	"syscall"
 
 	"github.com/ctuzelov/region-todo/cmd/server"
-	_ "github.com/ctuzelov/region-todo/docs"
 	"github.com/ctuzelov/region-todo/pkg/handler"
 	"github.com/ctuzelov/region-todo/pkg/repository"
 	"github.com/ctuzelov/region-todo/pkg/service"

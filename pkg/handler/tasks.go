@@ -10,7 +10,6 @@ import (
 
 	"github.com/ctuzelov/region-todo/pkg/models"
 	"github.com/gin-gonic/gin"
-	_ "github.com/swaggo/gin-swagger"
 )
 
 type todoForm struct {
@@ -103,6 +102,11 @@ func (h *Handler) getTasksByStatus(g *gin.Context) {
 				ActiveAt: tasks[i].ActiveAt.Format("2006-01-02"),
 			})
 		}
+	}
+
+	if len(response) == 0 {
+		g.JSON(http.StatusOK, []todoForm{})
+		return
 	}
 
 	g.JSON(http.StatusOK, response)
