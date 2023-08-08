@@ -3,8 +3,10 @@ package handler
 import (
 	"github.com/ctuzelov/region-todo/pkg/service"
 	"github.com/gin-gonic/gin"
-	swaggerFiles "github.com/swaggo/files"
+	swaggerfiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
+
+	_ "github.com/ctuzelov/region-todo/docs"
 )
 
 type Handler struct {
@@ -15,11 +17,20 @@ func NewHandler(services *service.Service) *Handler {
 	return &Handler{service: services}
 }
 
+// tasksRouter defines operations for managing tasks.
+//	@Summary		Manage tasks
+//	@Description	Operations for managing tasks
+//	@Tags			Tasks
+//	@Router			/api/todo-list/tasks/{id} [delete]
+//	@Router			/api/todo-list/tasks [post]
+//	@Router			/api/todo-list/tasks [get]
+//	@Router			/api/todo-list/tasks/{id} [put]
+//	@Router			/api/todo-list/tasks/{id}/done [put]
+
 func (h *Handler) InitRoutes() *gin.Engine {
 	router := gin.New()
 
-	url := ginSwagger.URL("http://localhost:8080/swagger/doc.json") // The url pointing to API definition
-	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler, url))
+	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerfiles.Handler))
 
 	tasks := router.Group("/api/todo-list/tasks")
 
