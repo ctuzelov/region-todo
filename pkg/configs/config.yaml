@@ -2,7 +2,7 @@ port: "8080"
 
 db:
   driver: "mongodb"
-  username: "root"
+  username: "mongo"
   password: "123"
   host: "localhost"
-  port: "2717"
+  port: "27017"
