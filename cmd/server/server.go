@@ -4,6 +4,8 @@ import (
 	"context"
 	"net/http"
 	"time"
+
+	"github.com/spf13/viper"
 )
 
 type Server struct {
@@ -23,4 +25,10 @@ func (s *Server) Run(port string, handler http.Handler) error {
 
 func (s *Server) Shutdown(ctx context.Context) error {
 	return s.httpServer.Shutdown(ctx)
+}
+
+func InitConfig() error {
+	viper.AddConfigPath("pkg/configs")
+	viper.SetConfigName("config")
+	return viper.ReadInConfig()
 }
