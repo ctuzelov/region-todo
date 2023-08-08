@@ -12,6 +12,8 @@ type Server struct {
 	httpServer *http.Server
 }
 
+// * Запуск HTTP-сервера на указанном порту с заданным обработчиком.
+// * Возвращает ошибку, если не удается запустить сервер.
 func (s *Server) Run(port string, handler http.Handler) error {
 	s.httpServer = &http.Server{
 		Addr:           ":" + port,

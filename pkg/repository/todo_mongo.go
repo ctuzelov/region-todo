@@ -22,21 +22,21 @@ func NewToDoTasksMongoDB(db *mongo.Client) *ToDoTasksMongoDB {
 }
 
 func (r *ToDoTasksMongoDB) CreateTask(task models.Task) (int, error) {
-	// Получение ссылки на коллекцию "tasks" в базе данных "testdb"
-	tasksCollection := r.db.Database("testdb").Collection("tasks")
+	// * Получение ссылки на коллекцию "tasks" в базе данных "taskdb"
+	tasksCollection := r.db.Database("taskdb").Collection("tasks")
 
-	// Создание счетчика, если его нет
-	countersCollection := r.db.Database("testdb").Collection("counters")
+	// * Создание счетчика, если его нет
+	countersCollection := r.db.Database("taskdb").Collection("counters")
 	countersCollection.InsertOne(context.Background(), models.Counter{ID: "taskID", Sequence: 0})
 
-	// Генерация нового _id на основе счетчика
+	// * Генерация нового _id на основе счетчика
 	var counter models.Counter
 	err := countersCollection.FindOneAndUpdate(context.Background(), bson.M{"_id": "taskID"}, bson.M{"$inc": bson.M{"sequence": 1}}).Decode(&counter)
 	if err != nil {
 		return 0, err
 	}
 
-	// Получение текущего значения счетчика
+	// * Получение текущего значения счетчика
 	err = countersCollection.FindOne(context.Background(), bson.M{"_id": "taskID"}).Decode(&models.Counter{})
 	if err != nil {
 		return 0, err
@@ -50,7 +50,7 @@ func (r *ToDoTasksMongoDB) CreateTask(task models.Task) (int, error) {
 		CreatedAt: time.Now(),
 	}
 
-	// Проверяем наличие дубликата
+	// * Проверяем наличие дубликата
 	filter := bson.M{"title": task.Title, "activeAt": task.ActiveAt}
 	err = tasksCollection.FindOne(context.Background(), filter).Decode(&todo)
 	if err == nil {
@@ -60,7 +60,7 @@ func (r *ToDoTasksMongoDB) CreateTask(task models.Task) (int, error) {
 		return 0, err
 	}
 
-	// Вставка документа в MongoDB
+	// ! Вставка документа в MongoDB
 	_, err = tasksCollection.InsertOne(context.Background(), todo)
 	if err != nil {
 		return 0, err
@@ -69,15 +69,16 @@ func (r *ToDoTasksMongoDB) CreateTask(task models.Task) (int, error) {
 }
 
 func (r *ToDoTasksMongoDB) ReadTasks(status string) ([]models.Task, error) {
-	// Подключение к коллекции "people" в базе данных "testdb"
-	collection := r.db.Database("testdb").Collection("tasks")
+	// * Подключение к коллекции "tasks" в базе данных "taskdb"
+	collection := r.db.Database("taskdb").Collection("tasks")
 
 	filter := bson.M{"status": status}
 
-	// Поиск документа по указанному id
+	// * Поиск документа по указанному id
 	var todo []models.Task
 	all, err := collection.Find(context.Background(), filter)
 
+	// * Итерация по найденным задачам
 	for all.Next(context.Background()) {
 		var task models.Task
 		if err := all.Decode(&task); err != nil {
@@ -95,13 +96,13 @@ func (r *ToDoTasksMongoDB) ReadTasks(status string) ([]models.Task, error) {
 }
 
 func (r *ToDoTasksMongoDB) DeleteTask(id int) error {
-	// Get a reference to the "tasks" taskscollection in the "testdb" database
-	tasksCollection := r.db.Database("testdb").Collection("tasks")
+	// * Подключение к коллекции "tasks" в базе данных "taskdb"
+	tasksCollection := r.db.Database("taskdb").Collection("tasks")
 
-	// Create a filter to find the task by ID
+	// * Создание фильтра для поиска задачи по ID
 	filter := bson.M{"_id": id}
 
-	// Delete the task from the collection
+	// ! Удаление задачи из коллекции
 	res, err := tasksCollection.DeleteOne(context.Background(), filter)
 	if res.DeletedCount == 0 {
 		return fmt.Errorf("no object with the given id = %d", id)
@@ -110,13 +111,13 @@ func (r *ToDoTasksMongoDB) DeleteTask(id int) error {
 }
 
 func (r *ToDoTasksMongoDB) UpdateTaskStatus(id int) error {
-	// Get a reference to the "tasks" tasksCollection in the "testdb" database
-	tasksCollection := r.db.Database("testdb").Collection("tasks")
+	// * Подключение к коллекции "tasks" в базе данных "taskdb"
+	tasksCollection := r.db.Database("taskdb").Collection("tasks")
 
-	// Create a filter to find the task by ID
+	// * Создание фильтра для поиска задачи по ID
 	filter := bson.M{"_id": id}
 
-	// Update the "status" field in the task
+	// ! Обновление поле "статус" в задаче
 	update := bson.M{"$set": bson.M{"status": newStatus}}
 	res, err := tasksCollection.UpdateOne(context.Background(), filter, update)
 	if res.MatchedCount == 0 {
@@ -126,19 +127,19 @@ func (r *ToDoTasksMongoDB) UpdateTaskStatus(id int) error {
 }
 
 func (r *ToDoTasksMongoDB) UpdateTask(id int, task models.Task) error {
-	// Get a reference to the "tasks" tasksCollection in the "testdb" database
-	tasksCollection := r.db.Database("testdb").Collection("tasks")
+	// * Подключение к коллекции "tasks" в базе данных "taskdb"
+	tasksCollection := r.db.Database("taskdb").Collection("tasks")
 
-	// Создаем фильтр для поиска по ID
+	// * Создание фильтра для поиска задачи по ID
 	filter := bson.M{"_id": id}
 
-	// Создаем обновление только для полей Title и ActiveAt
+	// * Создаем обновление только для полей Title и ActiveAt
 	update := bson.M{"$set": bson.M{"title": task.Title, "activeAt": task.ActiveAt}}
 
+	// ! Обновление полей Title и ActiveAt в задаче
 	res, err := tasksCollection.UpdateOne(context.Background(), filter, update)
 	if res.MatchedCount == 0 {
 		return fmt.Errorf("no object with the given id = %d", id)
 	}
 	return err
 }
-

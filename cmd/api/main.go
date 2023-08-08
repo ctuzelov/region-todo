@@ -18,25 +18,19 @@ import (
 
 // @title TODO TASKS API
 // @version 1.0
-// @description This is a sample server server.
-// @termsOfService http://swagger.io/terms/
-
-// @contact.name API Support
-// @contact.url http://www.swagger.io/support
-// @contact.email support@swagger.io
-
-// @license.name Apache 2.0
-// @license.url http://www.apache.org/licenses/LICENSE-2.0.html
+// @description This is a sample todo server.
 
 // @host localhost:8080
 // @BasePath /
 // @schemes http
 
 func main() {
+	// * начинаем выполнять инициализацию конфигурации сервера
 	if err := server.InitConfig(); err != nil {
 		log.Fatalf("error %s occured while initializating configs", err)
 	}
 
+	// ? хост и пароль нужны в случае если запускать с переменными окружения
 	db, err := repository.NewMongoDB(repository.Config{
 		Driver:   viper.GetString("db.driver"),
 		Username: viper.GetString("db.username"),
@@ -45,7 +39,7 @@ func main() {
 		Port:     viper.GetString("db.port"),
 	})
 
-	// Close the connection when the function returns.
+	// * Закрываем соединение, когда функция вернется
 	defer func() {
 		if err = db.Disconnect(context.Background()); err != nil {
 			log.Fatal("Failed to close the database connection:", err)
@@ -53,6 +47,7 @@ func main() {
 		fmt.Println("Connection to MongoDB closed.")
 	}()
 
+	// * инициализация слоев и сервера
 	repo := repository.NewRepository(db)
 	service := service.NewService(repo)
 	handler := handler.NewHandler(service)
@@ -64,6 +59,8 @@ func main() {
 	}()
 	log.Printf("listening on http://localhost:" + viper.GetString("port"))
 
+	// * Контролируемая остановка приложения: ожидание сигнала завершения,
+	// * завершение сервера и обработка ошибок.
 	quit := make(chan os.Signal, 1)
 	signal.Notify(quit, syscall.SIGTERM, syscall.SIGINT)
 	<-quit

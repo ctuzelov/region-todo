@@ -27,24 +27,30 @@ type todoForm struct {
 //	@Produce		json
 //	@Param			input	body	todoForm	true	"Task input"
 //	@Success		204		"No Content"
-//	@Failure		404		"Not Found"	
+//	@Failure		404		"Not Found"
 //	@Router			/api/todo-list/tasks [post]
 func (h *Handler) createTask(g *gin.Context) {
+	// * Получение данных из запроса
 	var input todoForm
 
+	// * Парсинг и валидация данных
 	err := Parser(g, &input)
 	if err != nil {
 		ErrorResponse(g, err.Error())
 		return
 	}
 
+	// * Валидация полей задачи
 	if !validator.Valid(validator.NotBlank(input.Title), validator.MaxChars(input.Title, 200), validator.IsValidDate(input.ActiveAt)) {
 		ErrorResponse(g, errForm.Error())
 		return
 	}
 
+	// * Преобразование строки времени в объект времени
 	convertedtime, _ := time.Parse("2006-01-02", input.ActiveAt)
 
+	// * Создание и сохранение задачи
+	// ? ActiveAt ковертируется с string в time.Timeчтобы записать в базу данных
 	validInput := models.Task{
 		Title:    input.Title,
 		ActiveAt: convertedtime,
@@ -59,6 +65,7 @@ func (h *Handler) createTask(g *gin.Context) {
 		return
 	}
 
+	// * Отправка успешного статуса
 	g.Status(http.StatusNoContent)
 }
 
@@ -71,8 +78,10 @@ func (h *Handler) createTask(g *gin.Context) {
 //	@Success		200		{array}	todoForm
 //	@Router			/api/todo-list/tasks [get]
 func (h *Handler) getTasksByStatus(g *gin.Context) {
+	// * Получение параметра статуса из запроса, по умолчанию "active".
 	status := g.DefaultQuery("status", "active")
 
+	// * Чтение задач из сервиса и обработка возможной ошибки.
 	tasks, err := h.service.ReadTasks(status)
 	if err != nil {
 		ErrorResponse(g, err.Error())
@@ -81,13 +90,14 @@ func (h *Handler) getTasksByStatus(g *gin.Context) {
 
 	currentDate := time.Now()
 
-	// Sort the tasks based on CreatedAt date (ascending order)
+	// * Сортировка задач по дате создания (по возрастанию).
 	sort.Slice(tasks, func(i, j int) bool {
 		return tasks[i].CreatedAt.Before(tasks[j].CreatedAt)
 	})
 
 	var response []todoForm
 
+	// * Обработка каждой задачи для формирования ответа.
 	for i := 0; i < len(tasks); i++ {
 		if tasks[i].ActiveAt.Weekday() == time.Saturday || tasks[i].ActiveAt.Weekday() == time.Sunday {
 			tasks[i].Title = fmt.Sprintf("ВЫХОДНОЙ - %s", tasks[i].Title)
@@ -106,11 +116,11 @@ func (h *Handler) getTasksByStatus(g *gin.Context) {
 		}
 	}
 
+	// ? Возвращение ответа в JSON формате, с учетом возможной пустоты.
 	if len(response) == 0 {
 		g.JSON(http.StatusOK, []todoForm{})
 		return
 	}
-
 	g.JSON(http.StatusOK, response)
 }
 
@@ -125,16 +135,17 @@ func (h *Handler) getTasksByStatus(g *gin.Context) {
 //	@Failure		404	"Not Found"	Task	not	found
 //	@Router			/api/todo-list/tasks/{id} [delete]
 func (h *Handler) deleteTaskByID(g *gin.Context) {
-	// Get the task ID from the URL parameters
+	// * Получение идентификатора задачи из параметров URL
 	idStr := g.Param("id")
 
-	// Convert the ID string to an integer
+	// * Преобразование строки идентификатора в целое число
 	id, err := strconv.Atoi(idStr)
 	if err != nil || id < 0 {
-		ErrorResponse(g, "invalid type")
+		ErrorResponse(g, "неверный тип")
 		return
 	}
 
+	// * Вызов сервисной функции для удаления задачи по идентификатору
 	err = h.service.DeleteTask(id)
 
 	if err != nil {
@@ -156,16 +167,17 @@ func (h *Handler) deleteTaskByID(g *gin.Context) {
 //	@Failure		404	"Not Found"		Task	not	found
 //	@Router			/api/todo-list/tasks/{id}/done [put]
 func (h *Handler) updateTaskStatusByID(g *gin.Context) {
-	// Get the task ID from the URL parameters
+	// * Получение ID задачи из параметра URL
 	idStr := g.Param("id")
 
-	// Convert the ID string to an integer
+	// * Преобразование строки ID в целое число
 	id, err := strconv.Atoi(idStr)
 	if err != nil || id < 0 {
 		ErrorResponse(g, "invalid type")
 		return
 	}
 
+	// * Обновление статуса задачи через сервис
 	err = h.service.UpdateTaskStatus(id)
 	if err != nil {
 		ErrorResponse(g, err.Error())
@@ -188,6 +200,8 @@ func (h *Handler) updateTaskStatusByID(g *gin.Context) {
 //	@Router			/api/todo-list/tasks/{id} [put]
 func (h *Handler) updateTaskByID(g *gin.Context) {
 	var input todoForm
+
+	// * Получение ID из параметра маршрута.
 	idStr := g.Param("id")
 	id, err := strconv.Atoi(idStr)
 	if err != nil || id < 0 {
@@ -195,24 +209,24 @@ func (h *Handler) updateTaskByID(g *gin.Context) {
 		return
 	}
 
+	// * Парсинг и валидация входных данных.
 	err = Parser(g, &input)
-	if err != nil {
-		ErrorResponse(g, err.Error())
-		return
-	}
-
-	if !validator.Valid(validator.NotBlank(input.Title), validator.MaxChars(input.Title, 200), validator.IsValidDate(input.ActiveAt)) {
+	if err != nil || !validator.Valid(validator.NotBlank(input.Title), validator.MaxChars(input.Title, 200), validator.IsValidDate(input.ActiveAt)) {
 		ErrorResponse(g, errForm.Error())
 		return
 	}
 
+	// * Преобразование строки даты в формат time.Time.
 	convertedtime, _ := time.Parse("2006-01-02", input.ActiveAt)
 
+	// * Создание и сохранение задачи
+	// ? ActiveAt ковертируется с string в time.Timeчтобы записать в базу данных
 	validInput := models.Task{
 		Title:    input.Title,
 		ActiveAt: convertedtime,
 	}
 
+	// * Обновление задачи через сервис и обработка ошибок.
 	err = h.service.ToDoTasks.UpdateTask(id, validInput)
 	if err != nil {
 		ErrorResponse(g, err.Error())

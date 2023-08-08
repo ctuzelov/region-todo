@@ -2,6 +2,7 @@ package repository
 
 import (
 	"context"
+	"fmt"
 	"log"
 
 	"go.mongodb.org/mongo-driver/mongo"
@@ -17,17 +18,17 @@ type Config struct {
 }
 
 func NewMongoDB(cnf Config) (*mongo.Client, error) {
-	// URI := fmt.Sprintf("%s://%s:%s@%s:%s", cnf.Driver, cnf.Username, cnf.Password, cnf.Host, cnf.Port)
-	// Set client options.
-	clientOptions := options.Client().ApplyURI("mongodb://mongo:27017")
+	URI := fmt.Sprintf("%s://%s:%s", cnf.Driver, cnf.Username, cnf.Port)
+	// * Установим параметры клиента
+	clientOptions := options.Client().ApplyURI(URI)
 
-	// Connect to MongoDB.
+	// * Подключимся к MongoDB
 	client, err := mongo.Connect(context.Background(), clientOptions)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	// Check the connection.
+	// * Проверка подключения
 	err = client.Ping(context.Background(), nil)
 	if err != nil {
 		log.Fatalf("Couldn't connect to the database: %s", err.Error())
