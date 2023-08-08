@@ -8,8 +8,10 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-var errForm = errors.New("follow next rules: title length <= 200 and not blank, ativeAt format 2023-01-01")
-var errDuplicate = errors.New("a task with such values already exists")
+var (
+	errForm      = errors.New("follow next rules: title length <= 200 and not blank, ativeAt format 2023-01-01")
+	errDuplicate = errors.New("a task with such values already exists")
+)
 
 func ErrorResponse(g *gin.Context, message string) {
 	logrus.Error(message)
