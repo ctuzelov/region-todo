@@ -3,3 +3,18 @@ mongo:
 
 mng:
 	docker exec -it mongodb bash
+
+# Определите имя вашего исполняемого файла
+APP_NAME = todo
+
+# Цель для сборки Docker-образа
+docker-build:
+	docker build -t $(APP_NAME) .
+
+# Цель для запуска Docker-compose
+docker-up:
+	docker-compose up
+
+# Цель для остановки и удаления контейнеров
+docker-down:
+	docker-compose down
