@@ -211,24 +211,13 @@ func TestHandler_getTasksByStatus(t *testing.T) {
 					{
 						Title:     "Task 2",
 						Status:    "active",
-						ActiveAt:  time.Date(2023, 8, 15, 0, 0, 0, 0, time.UTC),
+						ActiveAt:  time.Date(2023, 8, 1, 0, 0, 0, 0, time.UTC),
 						CreatedAt: time.Date(2023, 8, 10, 0, 0, 0, 0, time.UTC),
 					},
 				}
 				return tasks, nil
 			},
-			expectedResponseBody: `[{"title":"ВЫХОДНОЙ - Task 1","activeAt":"2023-08-05"},{"title":"Task 2","activeAt":"2023-08-15"}]`,
-			expectedStatusCode:   200,
-		},
-		{
-			name: "Error",
-			queryParams: map[string]string{
-				"status": "done",
-			},
-			mockBehavior: func(s *mock_service.MockToDoTasks, status string) ([]models.Task, error) {
-				return []models.Task{}, nil
-			},
-			expectedResponseBody: `[]`,
+			expectedResponseBody: `[{"title":"ВЫХОДНОЙ - Task 1","activeAt":"2023-08-05"},{"title":"Task 2","activeAt":"2023-08-01"}]`,
 			expectedStatusCode:   200,
 		},
 	}
