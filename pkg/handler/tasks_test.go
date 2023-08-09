@@ -39,16 +39,16 @@ func TestHandler_createTask(t *testing.T) {
 			},
 			expectedStatusCode: 204,
 		},
-		// {
-		// 	name:      "Error",
-		// 	inputBody: `{"title":"","activeAt":"2023-08-05"}`,
-		// 	inputTodo: models.Task{
-		// 		Title:    "",
-		// 		ActiveAt: convertedtime,
-		// 	},
-		// 	mockBehavior:       func(s *mock_service.MockToDoTasks, todo models.Task) {},
-		// 	expectedStatusCode: 404,
-		// },
+		{
+			name:      "Error",
+			inputBody: `{"title":"","activeAt":"2023-08-05"}`,
+			inputTodo: models.Task{
+				Title:    "",
+				ActiveAt: convertedtime,
+			},
+			mockBehavior:       func(s *mock_service.MockToDoTasks, todo models.Task) {},
+			expectedStatusCode: 404,
+		},
 	}
 
 	for _, testCase := range testTable {
