@@ -3,11 +3,15 @@ APP_NAME = todo
 
 # Цель для запуска контейнера MongoDB с параметрами
 mongo:
-	docker run --name region-todo_mongo_1 -p 2717:27017 -e MONGO_INITDB_ROOT_USERNAME=mongo -e MONGO_INITDB_ROOT_PASSWORD=123 -d mongo:4.4.23-focal
+	docker run --name region-todo_mongo_1 -p 27017:27017 -e MONGO_INITDB_ROOT_USERNAME=mongo -e MONGO_INITDB_ROOT_PASSWORD=123 -d mongo:4.4.23-focal
 
 # Цель для запуска оболочки в Docker-контейнере
 mng:
 	docker exec -it region-todo_mongo_1 bash
+
+# Цель для запуска unit-тестов
+test:
+	go test ./pkg/handler/...
 
 # Цель для сборки Docker-образа
 docker-build:
